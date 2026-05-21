@@ -12,17 +12,21 @@ uses
 type
   TForm2 = class(TForm)
     pnçFundo: TPanel;
-    lblTitulo: TLabel;
-    edtTarefas: TEdit;
-    btnAdicionar: TPngBitBtn;
-    clbTarefasConcluidas: TCheckListBox;
-    Label1: TLabel;
-    lblTarefasIncompletas: TLabel;
-    lblTarefasConmpletas: TLabel;
     FDQuery1: TFDQuery;
     DataSource1: TDataSource;
     FDConnection1: TFDConnection;
+    pnlTop: TPanel;
+    lblTitulo: TLabel;
+    Label1: TLabel;
+    pnlAdicionar: TPanel;
+    edtTarefas: TEdit;
+    btnAdicionar: TPngBitBtn;
+    pnlTarefasIncompletas: TPanel;
     memTarefasIncompletas: TMemo;
+    lblTarefasIncompletas: TLabel;
+    pnlListaCompleta: TPanel;
+    clbTarefasConcluidas: TCheckListBox;
+    lblTarefasConmpletas: TLabel;
     btnLimpar: TPngBitBtn;
     procedure btnAdicionarClick(Sender: TObject);
     procedure FormShow(Sender: TObject);
