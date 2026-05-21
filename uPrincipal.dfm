@@ -95,6 +95,7 @@
       Top = 336
       Width = 225
       Height = 121
+      OnClickCheck = clbTarefasConcluidasClickCheck
       ItemHeight = 13
       TabOrder = 2
     end
@@ -107,6 +108,15 @@
       Lines.Strings = (
         'memTarefasIncompletas')
       TabOrder = 3
+    end
+    object btnLimpar: TPngBitBtn
+      Left = 224
+      Top = 458
+      Width = 75
+      Height = 25
+      Caption = 'Limpar Lista'
+      TabOrder = 4
+      OnClick = btnLimparClick
     end
   end
   object FDQuery1: TFDQuery

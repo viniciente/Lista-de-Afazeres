@@ -1,0 +1,200 @@
+unit uPrincipal;
+
+interface
+
+uses
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, FireDAC.Stan.Intf, FireDAC.Stan.Option, FireDAC.Stan.Error, FireDAC.UI.Intf,
+  FireDAC.Phys.Intf, FireDAC.Stan.Def, FireDAC.Stan.Pool, FireDAC.Stan.Async, FireDAC.Phys, FireDAC.Phys.MSSQL,
+  FireDAC.Phys.MSSQLDef, FireDAC.VCLUI.Wait, Vcl.StdCtrls, Vcl.CheckLst, Vcl.Buttons, PngBitBtn, Vcl.ExtCtrls, Data.DB,
+  FireDAC.Comp.Client, FireDAC.Stan.Param, FireDAC.DatS, FireDAC.DApt.Intf, FireDAC.DApt, FireDAC.Comp.DataSet;
+
+type
+  TForm2 = class(TForm)
+    pnçFundo: TPanel;
+    lblTitulo: TLabel;
+    edtTarefas: TEdit;
+    btnAdicionar: TPngBitBtn;
+    clbTarefasConcluidas: TCheckListBox;
+    Label1: TLabel;
+    lblTarefasIncompletas: TLabel;
+    lblTarefasConmpletas: TLabel;
+    FDQuery1: TFDQuery;
+    DataSource1: TDataSource;
+    FDConnection1: TFDConnection;
+    memTarefasIncompletas: TMemo;
+    procedure btnAdicionarClick(Sender: TObject);
+    procedure FormShow(Sender: TObject);
+    procedure clbTarefasConcluidasClickCheck(Sender: TObject);
+  private
+    procedure AtualizarListas;
+    { Private declarations }
+  public
+    { Public declarations }
+  end;
+
+var
+  Form2: TForm2;
+
+implementation
+
+{$R *.dfm}
+
+procedure TForm2.AtualizarListas;
+var
+  TextoTarefa: string;
+  IdTarefa: Integer;
+  StatusTarefa: string;
+begin
+  memTarefasIncompletas.Lines.Clear;
+  clbTarefasConcluidas.Items.Clear;
+
+  try
+    FDQuery1.Close;
+    FDQuery1.SQL.Text := 'SELECT id, descricao FROM Tarefas WHERE status = ''Incompleta'' ORDER BY id ASC';
+    FDQuery1.Open;
+
+    while not FDQuery1.Eof do
+    begin
+      IdTarefa := FDQuery1.FieldByName('id').AsInteger;
+      TextoTarefa := Format('[%d] - %s', [IdTarefa, FDQuery1.FieldByName('descricao').AsString]);
+
+      memTarefasIncompletas.Lines.Add(TextoTarefa);
+
+      FDQuery1.Next;
+    end;
+
+    FDQuery1.Close;
+    FDQuery1.SQL.Text := 'SELECT id, descricao, status FROM Tarefas ORDER BY id ASC';
+    FDQuery1.Open;
+
+    while not FDQuery1.Eof do
+    begin
+      IdTarefa := FDQuery1.FieldByName('id').AsInteger;
+      StatusTarefa := FDQuery1.FieldByName('status').AsString;
+      TextoTarefa := Format('[%d] - %s', [IdTarefa, FDQuery1.FieldByName('descricao').AsString]);
+
+      clbTarefasConcluidas.Items.AddObject(TextoTarefa, TObject(IdTarefa));
+
+      if StatusTarefa = 'Concluida' then
+        clbTarefasConcluidas.Checked[clbTarefasConcluidas.Count - 1] := True;
+
+      FDQuery1.Next;
+    end;
+
+  except
+    on E: Exception do
+      ShowMessage('Erro ao carregar as tarefas: ' + E.Message);
+  end;
+end;
+
+procedure TForm2.btnAdicionarClick(Sender: TObject);
+begin
+  if Trim(edtTarefas.Text) = '' then
+  begin
+    ShowMessage('Por favor, digite uma tarefa!');
+    edtTarefas.SetFocus;
+    Exit;
+  end;
+
+  try
+    FDQuery1.Close;
+    FDQuery1.SQL.Text := 'INSERT INTO Tarefas (descricao, status) VALUES (:descricao, ''Incompleta'')';
+    FDQuery1.ParamByName('descricao').AsString := edtTarefas.Text;
+    FDQuery1.ExecSQL;
+
+    edtTarefas.Clear;
+    edtTarefas.SetFocus;
+
+    AtualizarListas;
+
+  except
+    on E: Exception do
+      ShowMessage('Erro ao salvar tarefa: ' + E.Message);
+  end;
+end;
+
+procedure TForm2.FormShow(Sender: TObject);
+begin
+  AtualizarListas;
+end;
+
+procedure TForm2.clbTarefasConcluidasClickCheck(Sender: TObject);
+var
+  Idx: Integer;
+  IdTarefa: Integer;
+  TextoCompleto: string;
+  I: Integer;
+  PrefixoID: string;
+begin
+  // Pega o índice do item que foi clicado
+  Idx := clbTarefasConcluidas.ItemIndex;
+
+  if Idx = -1 then Exit;
+
+  // Recupera o ID oculto e o texto da tarefa (independente de marcar ou desmarcar)
+  IdTarefa := Integer(clbTarefasConcluidas.Items.Objects[Idx]);
+  TextoCompleto := clbTarefasConcluidas.Items[Idx];
+
+  // ==========================================
+  // SITUAÇÃO A: O USUÁRIO MARCOU A TAREFA (CONCLUIU)
+  // ==========================================
+  if clbTarefasConcluidas.Checked[Idx] then
+  begin
+    try
+      // 1. Atualiza no SQL Server para 'Concluida'
+      FDQuery1.Close;
+      FDQuery1.SQL.Text := 'UPDATE Tarefas SET status = ''Concluida'' WHERE id = :id';
+      FDQuery1.ParamByName('id').AsInteger := IdTarefa;
+      FDQuery1.ExecSQL;
+
+      // 2. Mensagem de sucesso
+      ShowMessage('Parabéns! Você realizou a tarefa: ' + #13 + TextoCompleto);
+
+      // 3. Remove a linha correspondente do TMemo de Incompletas
+      PrefixoID := '[' + IntToStr(IdTarefa) + ']';
+      for I := memTarefasIncompletas.Lines.Count - 1 downto 0 do
+      begin
+        if Pos(PrefixoID, memTarefasIncompletas.Lines[I]) = 1 then
+        begin
+          memTarefasIncompletas.Lines.Delete(I);
+          Break;
+        end;
+      end;
+
+    except
+      on E: Exception do
+      begin
+        clbTarefasConcluidas.Checked[Idx] := False; // Desmarca se der erro no banco
+        ShowMessage('Erro ao concluir tarefa: ' + E.Message);
+      end;
+    end;
+  end
+  // ==========================================
+  // SITUAÇÃO B: O USUÁRIO DESMARCOU A TAREFA (VOLTOU ATRÁS)
+  // ==========================================
+  else
+  begin
+    try
+      // 1. Volta o status no SQL Server para 'Incompleta'
+      FDQuery1.Close;
+      FDQuery1.SQL.Text := 'UPDATE Tarefas SET status = ''Incompleta'' WHERE id = :id';
+      FDQuery1.ParamByName('id').AsInteger := IdTarefa;
+      FDQuery1.ExecSQL;
+
+      // 2. Adiciona a tarefa de volta ao TMemo de Incompletas
+      // Como o "TextoCompleto" já está guardado no formato "[ID] - Descrição",
+      // ele entra perfeito e padronizado no Memo.
+      memTarefasIncompletas.Lines.Add(TextoCompleto);
+
+    except
+      on E: Exception do
+      begin
+        clbTarefasConcluidas.Checked[Idx] := True; // Se der erro, força a caixinha a continuar marcada
+        ShowMessage('Erro ao reabrir tarefa: ' + E.Message);
+      end;
+    end;
+  end;
+end;
+
+end.

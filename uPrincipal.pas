@@ -1,4 +1,4 @@
-unit uPrincipal;
+Ôªøunit uPrincipal;
 
 interface
 
@@ -11,7 +11,7 @@ uses
 
 type
   TForm2 = class(TForm)
-    pnÁFundo: TPanel;
+    pn√ßFundo: TPanel;
     lblTitulo: TLabel;
     edtTarefas: TEdit;
     btnAdicionar: TPngBitBtn;
@@ -23,11 +23,11 @@ type
     DataSource1: TDataSource;
     FDConnection1: TFDConnection;
     memTarefasIncompletas: TMemo;
+    btnLimpar: TPngBitBtn;
     procedure btnAdicionarClick(Sender: TObject);
     procedure FormShow(Sender: TObject);
-    // MOVEU PARA C¡: Para o Delphi reconhecer o evento no Object Inspector,
-    // ele precisa estar aqui em cima junto com os outros componentes!
     procedure clbTarefasConcluidasClickCheck(Sender: TObject);
+    procedure btnLimparClick(Sender: TObject);
   private
     procedure AtualizarListas;
     { Private declarations }
@@ -48,12 +48,10 @@ var
   IdTarefa: Integer;
   StatusTarefa: string;
 begin
-  // 1. Limpa os dois componentes antes de recarregar do banco
   memTarefasIncompletas.Lines.Clear;
   clbTarefasConcluidas.Items.Clear;
 
   try
-    // 2. BUSCA AS INCOMPLETAS PARA O MEMO
     FDQuery1.Close;
     FDQuery1.SQL.Text := 'SELECT id, descricao FROM Tarefas WHERE status = ''Incompleta'' ORDER BY id ASC';
     FDQuery1.Open;
@@ -63,13 +61,11 @@ begin
       IdTarefa := FDQuery1.FieldByName('id').AsInteger;
       TextoTarefa := Format('[%d] - %s', [IdTarefa, FDQuery1.FieldByName('descricao').AsString]);
 
-      // Alimenta o seu Memo de incompletas
       memTarefasIncompletas.Lines.Add(TextoTarefa);
 
       FDQuery1.Next;
     end;
 
-    // 3. BUSCA TODAS AS TAREFAS PARA O CHECKLISTBOX (Espelhar tudo)
     FDQuery1.Close;
     FDQuery1.SQL.Text := 'SELECT id, descricao, status FROM Tarefas ORDER BY id ASC';
     FDQuery1.Open;
@@ -80,10 +76,8 @@ begin
       StatusTarefa := FDQuery1.FieldByName('status').AsString;
       TextoTarefa := Format('[%d] - %s', [IdTarefa, FDQuery1.FieldByName('descricao').AsString]);
 
-      // Adiciona no CheckListBox guardando o ID oculto em cada linha
       clbTarefasConcluidas.Items.AddObject(TextoTarefa, TObject(IdTarefa));
 
-      // Se no banco ela j· estiver concluÌda, deixa o Checkbox marcado
       if StatusTarefa = 'Concluida' then
         clbTarefasConcluidas.Checked[clbTarefasConcluidas.Count - 1] := True;
 
@@ -114,12 +108,52 @@ begin
     edtTarefas.Clear;
     edtTarefas.SetFocus;
 
-    // Recarrega tudo (vai para o Memo como pendente e para o CheckList como desmarcada)
     AtualizarListas;
 
   except
     on E: Exception do
       ShowMessage('Erro ao salvar tarefa: ' + E.Message);
+  end;
+end;
+
+procedure TForm2.btnLimparClick(Sender: TObject);
+begin
+  if MessageDlg('‚ö†Ô∏è ATEN√á√ÉO!' + #13#13 +
+                'Voc√™ tem certeza que deseja APAGAR TODAS as tarefas?' + #13 +
+                'Isso vai resetar a lista inteira e n√£o poder√° ser desfeito.',
+                mtWarning, [mbYes, mbNo], 0, mbNo) = mrYes then
+  begin
+    try
+      FDQuery1.Close;
+      FDQuery1.SQL.Text := 'TRUNCATE TABLE Tarefas';
+      FDQuery1.ExecSQL;
+
+      memTarefasIncompletas.Lines.Clear;
+      clbTarefasConcluidas.Items.Clear;
+      edtTarefas.Clear;
+
+      ShowMessage('Lista resetada com sucesso! Pronto para come√ßar de novo.');
+      edtTarefas.SetFocus;
+
+    except
+      on E: Exception do
+      begin
+        try
+          FDQuery1.Close;
+          FDQuery1.SQL.Text := 'DELETE FROM Tarefas';
+          FDQuery1.ExecSQL;
+
+          memTarefasIncompletas.Lines.Clear;
+          clbTarefasConcluidas.Items.Clear;
+          edtTarefas.Clear;
+          ShowMessage('Lista limpa com sucesso! (Nota: IDs n√£o foram zerados devido a restri√ß√µes do banco)');
+          edtTarefas.SetFocus;
+        except
+          on E2: Exception do
+            ShowMessage('Erro cr√≠tico ao tentar limpar o banco: ' + E2.Message);
+        end;
+      end;
+    end;
   end;
 end;
 
@@ -133,35 +167,60 @@ var
   Idx: Integer;
   IdTarefa: Integer;
   TextoCompleto: string;
+  I: Integer;
+  PrefixoID: string;
 begin
   Idx := clbTarefasConcluidas.ItemIndex;
 
   if Idx = -1 then Exit;
 
-  // SÛ faz a aÁ„o se o usu·rio MARCOU o quadradinho (Checked = True)
+  IdTarefa := Integer(clbTarefasConcluidas.Items.Objects[Idx]);
+  TextoCompleto := clbTarefasConcluidas.Items[Idx];
+
   if clbTarefasConcluidas.Checked[Idx] then
   begin
-    IdTarefa := Integer(clbTarefasConcluidas.Items.Objects[Idx]);
-    TextoCompleto := clbTarefasConcluidas.Items[Idx];
-
     try
-      // Atualiza no SQL Server 2014
       FDQuery1.Close;
       FDQuery1.SQL.Text := 'UPDATE Tarefas SET status = ''Concluida'' WHERE id = :id';
       FDQuery1.ParamByName('id').AsInteger := IdTarefa;
       FDQuery1.ExecSQL;
 
-      // Mensagem personalizada que vocÍ pediu
-      ShowMessage('ParabÈns! VocÍ realizou a tarefa: ' + #13 + TextoCompleto);
+      ShowMessage('Parab√©ns! Voc√™ realizou a tarefa: ' + #13 + TextoCompleto);
 
-      // Atualiza os dois componentes (Soma do Memo e atualiza o CheckList)
-      AtualizarListas;
+      PrefixoID := '[' + IntToStr(IdTarefa) + ']';
+      for I := memTarefasIncompletas.Lines.Count - 1 downto 0 do
+      begin
+        if Pos(PrefixoID, memTarefasIncompletas.Lines[I]) = 1 then
+        begin
+          memTarefasIncompletas.Lines.Delete(I);
+          Break;
+        end;
+      end;
 
     except
       on E: Exception do
       begin
-        clbTarefasConcluidas.Checked[Idx] := False; // Desmarca se der erro
+        clbTarefasConcluidas.Checked[Idx] := False;
         ShowMessage('Erro ao concluir tarefa: ' + E.Message);
+      end;
+    end;
+  end
+
+  else
+  begin
+    try
+      FDQuery1.Close;
+      FDQuery1.SQL.Text := 'UPDATE Tarefas SET status = ''Incompleta'' WHERE id = :id';
+      FDQuery1.ParamByName('id').AsInteger := IdTarefa;
+      FDQuery1.ExecSQL;
+
+      memTarefasIncompletas.Lines.Add(TextoCompleto);
+
+    except
+      on E: Exception do
+      begin
+        clbTarefasConcluidas.Checked[Idx] := True;
+        ShowMessage('Erro ao reabrir tarefa: ' + E.Message);
       end;
     end;
   end;
