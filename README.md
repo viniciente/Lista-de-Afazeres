@@ -99,12 +99,8 @@ Se encontrar problemas ou tiver dúvidas:
 - Confirme se o arquivo está sendo compilado sem erros
 - Abra uma issue no GitHub descrevendo o problema
 
-## 📄 Licença
-
-Este projeto está disponível para uso livre. Sinta-se à vontade para usar, modificar e compartilhar!
-
 ---
 
-**Desenvolvido com ❤️ por viniciente**
+**Desenvolvido por viniciente**
 
 Criado em: 2026 | Última atualização: 2026-05-22
