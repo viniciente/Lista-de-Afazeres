@@ -7,32 +7,35 @@ uses
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, FireDAC.Stan.Intf, FireDAC.Stan.Option, FireDAC.Stan.Error, FireDAC.UI.Intf,
   FireDAC.Phys.Intf, FireDAC.Stan.Def, FireDAC.Stan.Pool, FireDAC.Stan.Async, FireDAC.Phys, FireDAC.Phys.MSSQL,
   FireDAC.Phys.MSSQLDef, FireDAC.VCLUI.Wait, Vcl.StdCtrls, Vcl.CheckLst, Vcl.Buttons, PngBitBtn, Vcl.ExtCtrls, Data.DB,
-  FireDAC.Comp.Client, FireDAC.Stan.Param, FireDAC.DatS, FireDAC.DApt.Intf, FireDAC.DApt, FireDAC.Comp.DataSet;
+  FireDAC.Comp.Client, FireDAC.Stan.Param, FireDAC.DatS, FireDAC.DApt.Intf, FireDAC.DApt, FireDAC.Comp.DataSet, Vcl.Themes;
 
 type
   TForm2 = class(TForm)
-    pnçFundo: TPanel;
     FDQuery1: TFDQuery;
     DataSource1: TDataSource;
     FDConnection1: TFDConnection;
     pnlTop: TPanel;
     lblTitulo: TLabel;
     Label1: TLabel;
-    pnlAdicionar: TPanel;
+    pnlAdicionar: TGridPanel;
     edtTarefas: TEdit;
     btnAdicionar: TPngBitBtn;
     pnlTarefasIncompletas: TPanel;
-    memTarefasIncompletas: TMemo;
     lblTarefasIncompletas: TLabel;
     pnlListaCompleta: TPanel;
     clbTarefasConcluidas: TCheckListBox;
     lblTarefasConmpletas: TLabel;
     btnLimpar: TPngBitBtn;
+    lbTarefasIncompletas: TListBox;
     procedure btnAdicionarClick(Sender: TObject);
     procedure FormShow(Sender: TObject);
     procedure clbTarefasConcluidasClickCheck(Sender: TObject);
     procedure btnLimparClick(Sender: TObject);
+    procedure FormCreate(Sender: TObject);
+    procedure lbTarefasIncompletasDblClick(Sender: TObject);
   private
+    FEditando: Boolean;
+    FIdTarefaEmEdicao: Integer;
     procedure AtualizarListas;
     { Private declarations }
   public
@@ -52,7 +55,7 @@ var
   IdTarefa: Integer;
   StatusTarefa: string;
 begin
-  memTarefasIncompletas.Lines.Clear;
+  lbTarefasIncompletas.Items.Clear;
   clbTarefasConcluidas.Items.Clear;
 
   try
@@ -65,7 +68,7 @@ begin
       IdTarefa := FDQuery1.FieldByName('id').AsInteger;
       TextoTarefa := Format('[%d] - %s', [IdTarefa, FDQuery1.FieldByName('descricao').AsString]);
 
-      memTarefasIncompletas.Lines.Add(TextoTarefa);
+      lbTarefasIncompletas.Items.AddObject(TextoTarefa, TObject(IdTarefa));
 
       FDQuery1.Next;
     end;
@@ -105,9 +108,23 @@ begin
 
   try
     FDQuery1.Close;
-    FDQuery1.SQL.Text := 'INSERT INTO Tarefas (descricao, status) VALUES (:descricao, ''Incompleta'')';
-    FDQuery1.ParamByName('descricao').AsString := edtTarefas.Text;
-    FDQuery1.ExecSQL;
+
+    if FEditando then
+    begin
+      FDQuery1.SQL.Text := 'UPDATE Tarefas SET descricao = :descricao WHERE id = :id';
+      FDQuery1.ParamByName('descricao').AsString := edtTarefas.Text;
+      FDQuery1.ParamByName('id').AsInteger := FIdTarefaEmEdicao;
+      FDQuery1.ExecSQL;
+
+      FEditando := False;
+      btnAdicionar.Caption := 'ADICIONAR';
+    end
+    else
+    begin
+      FDQuery1.SQL.Text := 'INSERT INTO Tarefas (descricao, status) VALUES (:descricao, ''Incompleta'')';
+      FDQuery1.ParamByName('descricao').AsString := edtTarefas.Text;
+      FDQuery1.ExecSQL;
+    end;
 
     edtTarefas.Clear;
     edtTarefas.SetFocus;
@@ -117,6 +134,25 @@ begin
   except
     on E: Exception do
       ShowMessage('Erro ao salvar tarefa: ' + E.Message);
+  end;
+end;
+
+procedure TForm2.lbTarefasIncompletasDblClick(Sender: TObject);
+var
+  TextoLimpo: string;
+begin
+  if lbTarefasIncompletas.ItemIndex > -1 then
+  begin
+    FIdTarefaEmEdicao := Integer(lbTarefasIncompletas.Items.Objects[lbTarefasIncompletas.ItemIndex]);
+
+    TextoLimpo := lbTarefasIncompletas.Items[lbTarefasIncompletas.ItemIndex];
+    Delete(TextoLimpo, 1, Pos(' - ', TextoLimpo) + 2);
+
+    edtTarefas.Text := TextoLimpo;
+
+    FEditando := True;
+    btnAdicionar.Caption := 'SALVAR';
+    edtTarefas.SetFocus;
   end;
 end;
 
@@ -132,9 +168,12 @@ begin
       FDQuery1.SQL.Text := 'TRUNCATE TABLE Tarefas';
       FDQuery1.ExecSQL;
 
-      memTarefasIncompletas.Lines.Clear;
+      lbTarefasIncompletas.Items.Clear;
       clbTarefasConcluidas.Items.Clear;
       edtTarefas.Clear;
+
+      FEditando := False;
+      btnAdicionar.Caption := 'ADICIONAR';
 
       ShowMessage('Lista resetada com sucesso! Pronto para começar de novo.');
       edtTarefas.SetFocus;
@@ -147,9 +186,13 @@ begin
           FDQuery1.SQL.Text := 'DELETE FROM Tarefas';
           FDQuery1.ExecSQL;
 
-          memTarefasIncompletas.Lines.Clear;
+          lbTarefasIncompletas.Items.Clear;
           clbTarefasConcluidas.Items.Clear;
           edtTarefas.Clear;
+
+          FEditando := False;
+          btnAdicionar.Caption := 'ADICIONAR';
+
           ShowMessage('Lista limpa com sucesso! (Nota: IDs não foram zerados devido a restrições do banco)');
           edtTarefas.SetFocus;
         except
@@ -161,73 +204,49 @@ begin
   end;
 end;
 
-procedure TForm2.FormShow(Sender: TObject);
-begin
-  AtualizarListas;
-end;
-
 procedure TForm2.clbTarefasConcluidasClickCheck(Sender: TObject);
 var
   Idx: Integer;
   IdTarefa: Integer;
-  TextoCompleto: string;
-  I: Integer;
-  PrefixoID: string;
+  NovoStatus: string;
 begin
   Idx := clbTarefasConcluidas.ItemIndex;
-
   if Idx = -1 then Exit;
 
   IdTarefa := Integer(clbTarefasConcluidas.Items.Objects[Idx]);
-  TextoCompleto := clbTarefasConcluidas.Items[Idx];
 
   if clbTarefasConcluidas.Checked[Idx] then
-  begin
-    try
-      FDQuery1.Close;
-      FDQuery1.SQL.Text := 'UPDATE Tarefas SET status = ''Concluida'' WHERE id = :id';
-      FDQuery1.ParamByName('id').AsInteger := IdTarefa;
-      FDQuery1.ExecSQL;
-
-      ShowMessage('Parabéns! Você realizou a tarefa: ' + #13 + TextoCompleto);
-
-      PrefixoID := '[' + IntToStr(IdTarefa) + ']';
-      for I := memTarefasIncompletas.Lines.Count - 1 downto 0 do
-      begin
-        if Pos(PrefixoID, memTarefasIncompletas.Lines[I]) = 1 then
-        begin
-          memTarefasIncompletas.Lines.Delete(I);
-          Break;
-        end;
-      end;
-
-    except
-      on E: Exception do
-      begin
-        clbTarefasConcluidas.Checked[Idx] := False;
-        ShowMessage('Erro ao concluir tarefa: ' + E.Message);
-      end;
-    end;
-  end
-
+    NovoStatus := 'Concluida'
   else
-  begin
-    try
-      FDQuery1.Close;
-      FDQuery1.SQL.Text := 'UPDATE Tarefas SET status = ''Incompleta'' WHERE id = :id';
-      FDQuery1.ParamByName('id').AsInteger := IdTarefa;
-      FDQuery1.ExecSQL;
+    NovoStatus := 'Incompleta';
 
-      memTarefasIncompletas.Lines.Add(TextoCompleto);
+  try
+    FDQuery1.Close;
+    FDQuery1.SQL.Text := 'UPDATE Tarefas SET status = :status WHERE id = :id';
+    FDQuery1.ParamByName('status').AsString := NovoStatus;
+    FDQuery1.ParamByName('id').AsInteger := IdTarefa;
+    FDQuery1.ExecSQL;
 
-    except
-      on E: Exception do
-      begin
-        clbTarefasConcluidas.Checked[Idx] := True;
-        ShowMessage('Erro ao reabrir tarefa: ' + E.Message);
-      end;
+    AtualizarListas;
+
+  except
+    on E: Exception do
+    begin
+      clbTarefasConcluidas.Checked[Idx] := not clbTarefasConcluidas.Checked[Idx];
+      ShowMessage('Erro ao atualizar status da tarefa: ' + E.Message);
     end;
   end;
+end;
+
+procedure TForm2.FormCreate(Sender: TObject);
+begin
+  lblTitulo.Font.Color := $003399;
+  FEditando := False;
+end;
+
+procedure TForm2.FormShow(Sender: TObject);
+begin
+  AtualizarListas;
 end;
 
 end.

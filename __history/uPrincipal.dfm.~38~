@@ -1,0 +1,289 @@
+object Form2: TForm2
+  Left = 0
+  Top = 0
+  Caption = 'Lista de Afazeres'
+  ClientHeight = 550
+  ClientWidth = 600
+  Color = clWhite
+  Font.Charset = DEFAULT_CHARSET
+  Font.Color = clWindowText
+  Font.Height = -15
+  Font.Name = 'Segoe UI'
+  Font.Style = []
+  OldCreateOrder = True
+  Position = poScreenCenter
+  OnShow = FormShow
+  PixelsPerInch = 96
+  TextHeight = 20
+  object pnlFundo: TPanel
+    Left = 0
+    Top = 0
+    Width = 600
+    Height = 550
+    Align = alClient
+    Color = 15132390
+    ParentBackground = False
+    TabOrder = 0
+    object pnlTop: TPanel
+      AlignWithMargins = True
+      Left = 4
+      Top = 4
+      Width = 592
+      Height = 80
+      Align = alTop
+      BevelOuter = bvNone
+      Color = clWhite
+      ParentBackground = False
+      TabOrder = 0
+      object lblTitulo: TLabel
+        AlignWithMargins = True
+        Left = 3
+        Top = 3
+        Width = 586
+        Height = 30
+        Align = alTop
+        Alignment = taCenter
+        Caption = 'Lista de Afazeres'
+        Font.Charset = ANSI_CHARSET
+        Font.Color = 10485760
+        Font.Height = -21
+        Font.Name = 'Segoe UI'
+        Font.Style = [fsBold]
+        ParentFont = False
+        ExplicitWidth = 164
+      end
+      object Label1: TLabel
+        AlignWithMargins = True
+        Left = 3
+        Top = 39
+        Width = 586
+        Height = 38
+        Align = alClient
+        Alignment = taCenter
+        Caption = 'Digite uma tarefa pendente'
+        Font.Charset = ANSI_CHARSET
+        Font.Color = clWindowText
+        Font.Height = -13
+        Font.Name = 'Segoe UI'
+        Font.Style = [fsUnderline]
+        ParentFont = False
+        ExplicitWidth = 160
+        ExplicitHeight = 17
+      end
+    end
+    object pnlAdicionar: TGridPanel
+      AlignWithMargins = True
+      Left = 4
+      Top = 90
+      Width = 592
+      Height = 50
+      Align = alTop
+      BevelOuter = bvNone
+      ColumnCollection = <
+        item
+          Value = 75.000000000000000000
+        end
+        item
+          Value = 25.000000000000000000
+        end>
+      ControlCollection = <
+        item
+          Column = 0
+          Control = edtTarefas
+          Row = 0
+        end
+        item
+          Column = 1
+          Control = btnAdicionar
+          Row = 0
+        end>
+      RowCollection = <
+        item
+          Value = 100.000000000000000000
+        end>
+      TabOrder = 1
+      object edtTarefas: TEdit
+        AlignWithMargins = True
+        Left = 5
+        Top = 5
+        Width = 434
+        Height = 40
+        Margins.Left = 5
+        Margins.Top = 5
+        Margins.Right = 5
+        Margins.Bottom = 5
+        Align = alClient
+        Alignment = taCenter
+        TabOrder = 0
+        ExplicitHeight = 28
+      end
+      object btnAdicionar: TPngBitBtn
+        AlignWithMargins = True
+        Left = 449
+        Top = 5
+        Width = 138
+        Height = 40
+        Margins.Left = 5
+        Margins.Top = 5
+        Margins.Right = 5
+        Margins.Bottom = 5
+        Align = alClient
+        Caption = 'ADICIONAR'
+        TabOrder = 1
+        OnClick = btnAdicionarClick
+        PngImage.Data = {
+          89504E470D0A1A0A0000000D49484452000000100000001008060000001FF3FF
+          610000000473424954080808087C086488000000097048597300000076000000
+          76014E7B26080000001974455874536F667477617265007777772E696E6B7363
+          6170652E6F72679BEE3C1A0000013E4944415478DAA5D32F48834118C7F17759
+          14C430D70C2675630E0606A30671561D0B46D914A3D886C564F20F98C420A241
+          34889B8C61120C629938C16212740A82580C8ADF079E078E97535EF1810F07F7
+          DEFDEEEE7DEF8D05FFAC98A72F8179E4D08B2FDCE104EB68FD16308E1DEC630F
+          37F844065398C40C0E7C01F27005795CFCB06309AA62CE422CA05B57CB8526A7
+          B46D387D5954D087670B58462766432B2E855AAB2D3CA06C01D728E13C62C030
+          D6E44816F08E1EBCE8B6C7B47F44DBBAB6155DAC0BF7E8B080967EB2370D2838
+          2B05CECE7635A01D8F68B3802B2CE02CE21186B089410B58D423942206C8857A
+          755FA27CC6264675375649E7255BA551C3801CDDBD4872D3563181CBC05F32F9
+          48777A2A1DE1AB2CB77103C7D8C62D3E7427055DA488439BE0FB99E298D6C1FD
+          3A4682EC677A7207FB02FE54DFD8784311277FCC090000000049454E44AE4260
+          82}
+      end
+    end
+    object pnlTarefasIncompletas: TPanel
+      AlignWithMargins = True
+      Left = 4
+      Top = 146
+      Width = 592
+      Height = 200
+      Align = alClient
+      BevelOuter = bvNone
+      Color = clWhite
+      ParentBackground = False
+      TabOrder = 2
+      object lblTarefasIncompletas: TLabel
+        AlignWithMargins = True
+        Left = 3
+        Top = 3
+        Width = 586
+        Height = 21
+        Align = alTop
+        Alignment = taCenter
+        Caption = 'Lista de Tarefas Incompletas'
+        Font.Charset = ANSI_CHARSET
+        Font.Color = clWindowText
+        Font.Height = -16
+        Font.Name = 'Segoe UI'
+        Font.Style = [fsBold, fsUnderline]
+        ParentFont = False
+        ExplicitWidth = 214
+      end
+      object memTarefasIncompletas: TMemo
+        AlignWithMargins = True
+        Left = 3
+        Top = 30
+        Width = 586
+        Height = 167
+        Align = alClient
+        CharCase = ecUpperCase
+        Font.Charset = ANSI_CHARSET
+        Font.Color = clWindowText
+        Font.Height = -13
+        Font.Name = 'Consolas'
+        Font.Style = []
+        Lines.Strings = (
+          '')
+        ParentFont = False
+        ReadOnly = True
+        ScrollBars = ssVertical
+        TabOrder = 0
+      end
+    end
+    object pnlListaCompleta: TPanel
+      AlignWithMargins = True
+      Left = 4
+      Top = 352
+      Width = 592
+      Height = 194
+      Align = alBottom
+      BevelOuter = bvNone
+      Color = clWhite
+      ParentBackground = False
+      TabOrder = 3
+      DesignSize = (
+        592
+        194)
+      object lblTarefasConmpletas: TLabel
+        AlignWithMargins = True
+        Left = 3
+        Top = 3
+        Width = 586
+        Height = 21
+        Align = alTop
+        Alignment = taCenter
+        Caption = 'Lista de Tarefas Realizadas'
+        Font.Charset = ANSI_CHARSET
+        Font.Color = clWindowText
+        Font.Height = -16
+        Font.Name = 'Segoe UI'
+        Font.Style = [fsBold, fsUnderline]
+        ParentFont = False
+        ExplicitWidth = 201
+      end
+      object clbTarefasConcluidas: TCheckListBox
+        AlignWithMargins = True
+        Left = 3
+        Top = 30
+        Width = 586
+        Height = 161
+        OnClickCheck = clbTarefasConcluidasClickCheck
+        Align = alClient
+        ItemHeight = 13
+        Style = lbOwnerDrawFixed
+        TabOrder = 0
+      end
+      object btnLimpar: TPngBitBtn
+        AlignWithMargins = True
+        Left = 248
+        Top = 167
+        Width = 97
+        Height = 25
+        Anchors = [akTop]
+        Caption = 'LIMPAR LISTA'
+        TabOrder = 1
+        OnClick = btnLimparClick
+        PngImage.Data = {
+          89504E470D0A1A0A0000000D49484452000000100000001008060000001FF3FF
+          610000000473424954080808087C086488000000097048597300000059000000
+          5901AA9DA9860000001974455874536F667477617265007777772E696E6B7363
+          6170652E6F72679BEE3C1A0000000044415478C46396DF}
+      end
+    end
+  end
+  object FDQuery1: TFDQuery
+    Active = True
+    Connection = FDConnection1
+    SQL.Strings = (
+      'SELECT id,'
+      '       descricao,'
+      '   status'
+      'FROM Tarefas'
+      'ORDER BY id')
+    Left = 488
+    Top = 96
+  end
+  object DataSource1: TDataSource
+    Left = 496
+    Top = 152
+  end
+  object FDConnection1: TFDConnection
+    Params.Strings = (
+      'Database=listaAfazeres'
+      'Server=DC-TR-06-VM\SERVERCURSO'
+      'OSAuthent=Yes'
+      'DriverID=MSSQL')
+    Connected = True
+    LoginPrompt = False
+    Left = 488
+    Top = 32
+  end
+end

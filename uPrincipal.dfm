@@ -1,118 +1,133 @@
-﻿object Form2: TForm2
+object Form2: TForm2
   Left = 0
   Top = 0
-  Align = alClient
   Caption = 'Lista de Afazeres'
-  ClientHeight = 495
-  ClientWidth = 547
-  Color = clBtnFace
+  ClientHeight = 553
+  ClientWidth = 600
+  Color = clWhite
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
-  Font.Height = -11
-  Font.Name = 'Tahoma'
+  Font.Height = -15
+  Font.Name = 'Segoe UI'
   Font.Style = []
-  OldCreateOrder = False
+  OldCreateOrder = True
   Position = poScreenCenter
   OnShow = FormShow
   PixelsPerInch = 96
-  TextHeight = 13
-  object pnçFundo: TPanel
+  TextHeight = 20
+  object pnlFundo: TPanel
     Left = 0
     Top = 0
-    Width = 547
-    Height = 495
+    Width = 600
+    Height = 553
     Align = alClient
+    Color = 15132390
+    ParentBackground = False
     TabOrder = 0
-    ExplicitLeft = 8
-    ExplicitTop = 8
-    ExplicitHeight = 487
-    DesignSize = (
-      547
-      495)
+    ExplicitHeight = 550
     object pnlTop: TPanel
       AlignWithMargins = True
       Left = 4
       Top = 4
-      Width = 539
-      Height = 64
+      Width = 592
+      Height = 80
       Align = alTop
       BevelOuter = bvNone
+      Color = clWhite
+      ParentBackground = False
       TabOrder = 0
-      ExplicitLeft = 2
-      ExplicitTop = 0
-      ExplicitWidth = 545
       object lblTitulo: TLabel
         AlignWithMargins = True
         Left = 3
         Top = 3
-        Width = 533
-        Height = 30
+        Width = 586
+        Height = 32
         Align = alTop
         Alignment = taCenter
         Caption = 'Lista de Afazeres'
         Font.Charset = ANSI_CHARSET
-        Font.Color = clWindowText
-        Font.Height = -21
-        Font.Name = '@Yu Gothic UI'
+        Font.Color = 10485760
+        Font.Height = -24
+        Font.Name = 'Segoe UI'
         Font.Style = [fsBold]
         ParentFont = False
-        ExplicitLeft = 183
-        ExplicitTop = -1
-        ExplicitWidth = 160
+        ExplicitWidth = 192
       end
       object Label1: TLabel
         AlignWithMargins = True
         Left = 3
-        Top = 39
-        Width = 533
-        Height = 22
+        Top = 41
+        Width = 586
+        Height = 36
         Align = alClient
         Alignment = taCenter
         Caption = 'Digite uma tarefa pendente'
         Font.Charset = ANSI_CHARSET
         Font.Color = clWindowText
-        Font.Height = -16
-        Font.Name = '@Yu Gothic UI'
-        Font.Style = [fsBold, fsUnderline]
+        Font.Height = -20
+        Font.Name = 'Segoe UI'
+        Font.Style = [fsUnderline]
         ParentFont = False
-        ExplicitLeft = 161
-        ExplicitTop = 35
-        ExplicitWidth = 201
-        ExplicitHeight = 21
+        ExplicitWidth = 239
+        ExplicitHeight = 28
       end
     end
-    object pnlAdicionar: TPanel
+    object pnlAdicionar: TGridPanel
       AlignWithMargins = True
       Left = 4
-      Top = 74
-      Width = 539
-      Height = 72
+      Top = 90
+      Width = 592
+      Height = 50
       Align = alTop
       BevelOuter = bvNone
+      ColumnCollection = <
+        item
+          Value = 75.000000000000000000
+        end
+        item
+          Value = 25.000000000000000000
+        end>
+      ControlCollection = <
+        item
+          Column = 0
+          Control = edtTarefas
+          Row = 0
+        end
+        item
+          Column = 1
+          Control = btnAdicionar
+          Row = 0
+        end>
+      RowCollection = <
+        item
+          Value = 100.000000000000000000
+        end>
       TabOrder = 1
-      ExplicitLeft = 2
-      ExplicitTop = 65
-      ExplicitWidth = 545
-      DesignSize = (
-        539
-        72)
       object edtTarefas: TEdit
         AlignWithMargins = True
-        Left = 148
-        Top = 6
-        Width = 225
-        Height = 21
-        Alignment = taCenter
-        Anchors = []
+        Left = 5
+        Top = 5
+        Width = 434
+        Height = 40
+        Margins.Left = 5
+        Margins.Top = 5
+        Margins.Right = 5
+        Margins.Bottom = 5
+        Align = alClient
         TabOrder = 0
+        ExplicitHeight = 28
       end
       object btnAdicionar: TPngBitBtn
         AlignWithMargins = True
-        Left = 212
-        Top = 33
-        Width = 97
-        Height = 25
-        Anchors = []
+        Left = 449
+        Top = 5
+        Width = 138
+        Height = 40
+        Margins.Left = 5
+        Margins.Top = 5
+        Margins.Right = 5
+        Margins.Bottom = 5
+        Align = alClient
         Caption = 'ADICIONAR'
         TabOrder = 1
         OnClick = btnAdicionarClick
@@ -132,100 +147,101 @@
           48777A2A1DE1AB2CB77103C7D8C62D3E7427055DA488439BE0FB99E298D6C1FD
           3A4682EC677A7207FB02FE54DFD8784311277FCC090000000049454E44AE4260
           82}
-        ExplicitLeft = 215
       end
     end
     object pnlTarefasIncompletas: TPanel
       AlignWithMargins = True
-      Left = 2
-      Top = 143
-      Width = 545
-      Height = 184
-      Anchors = [akLeft, akTop, akRight]
+      Left = 4
+      Top = 146
+      Width = 592
+      Height = 203
+      Align = alClient
       BevelOuter = bvNone
+      Color = clWhite
+      ParentBackground = False
       TabOrder = 2
-      DesignSize = (
-        545
-        184)
+      ExplicitHeight = 200
       object lblTarefasIncompletas: TLabel
         AlignWithMargins = True
-        Left = 159
-        Top = 4
-        Width = 207
+        Left = 3
+        Top = 3
+        Width = 586
         Height = 21
+        Align = alTop
         Alignment = taCenter
-        Anchors = []
         Caption = 'Lista de Tarefas Incompletas'
         Font.Charset = ANSI_CHARSET
         Font.Color = clWindowText
         Font.Height = -16
-        Font.Name = '@Yu Gothic UI'
+        Font.Name = 'Segoe UI'
         Font.Style = [fsBold, fsUnderline]
         ParentFont = False
-        ExplicitTop = 6
+        ExplicitWidth = 214
       end
-      object memTarefasIncompletas: TMemo
-        Left = 150
-        Top = 31
-        Width = 231
-        Height = 117
-        Anchors = []
-        CharCase = ecUpperCase
-        Lines.Strings = (
-          'MEMTAREFASINCOMPLETAS')
-        ReadOnly = True
-        ScrollBars = ssBoth
+      object lbTarefasIncompletas: TListBox
+        Left = 0
+        Top = 27
+        Width = 592
+        Height = 176
+        Align = alClient
+        ItemHeight = 20
         TabOrder = 0
+        OnDblClick = lbTarefasIncompletasDblClick
+        ExplicitLeft = 184
+        ExplicitTop = 64
+        ExplicitWidth = 121
+        ExplicitHeight = 97
       end
     end
     object pnlListaCompleta: TPanel
       AlignWithMargins = True
       Left = 4
-      Top = 316
-      Width = 539
-      Height = 175
+      Top = 355
+      Width = 592
+      Height = 194
       Align = alBottom
-      Anchors = [akLeft, akTop, akRight, akBottom]
       BevelOuter = bvNone
+      Color = clWhite
+      ParentBackground = False
       TabOrder = 3
-      ExplicitLeft = 1
-      ExplicitTop = 319
-      ExplicitWidth = 545
+      ExplicitTop = 352
       DesignSize = (
-        539
-        175)
+        592
+        194)
       object lblTarefasConmpletas: TLabel
         AlignWithMargins = True
-        Left = 167
-        Top = -3
-        Width = 192
+        Left = 3
+        Top = 3
+        Width = 586
         Height = 21
+        Align = alTop
         Alignment = taCenter
-        Anchors = []
         Caption = 'Lista de Tarefas Realizadas'
         Font.Charset = ANSI_CHARSET
         Font.Color = clWindowText
         Font.Height = -16
-        Font.Name = '@Yu Gothic UI'
+        Font.Name = 'Segoe UI'
         Font.Style = [fsBold, fsUnderline]
         ParentFont = False
+        ExplicitWidth = 201
       end
       object clbTarefasConcluidas: TCheckListBox
         AlignWithMargins = True
-        Left = 148
-        Top = 28
-        Width = 225
-        Height = 121
+        Left = 3
+        Top = 30
+        Width = 586
+        Height = 161
         OnClickCheck = clbTarefasConcluidasClickCheck
-        Anchors = [akTop]
+        Align = alClient
         ItemHeight = 13
+        Style = lbOwnerDrawFixed
         TabOrder = 0
       end
       object btnLimpar: TPngBitBtn
         AlignWithMargins = True
-        Left = 212
-        Top = 152
-        Width = 97
+        Left = 248
+        Top = 167
+        Width = 137
         Height = 25
         Anchors = [akTop]
         Caption = 'LIMPAR LISTA'
@@ -267,12 +283,12 @@
       '   status'
       'FROM Tarefas'
       'ORDER BY id')
-    Left = 488
-    Top = 248
+    Left = 544
+    Top = 80
   end
   object DataSource1: TDataSource
-    Left = 480
-    Top = 304
+    Left = 496
+    Top = 80
   end
   object FDConnection1: TFDConnection
     Params.Strings = (
@@ -282,7 +298,7 @@
       'DriverID=MSSQL')
     Connected = True
     LoginPrompt = False
-    Left = 448
-    Top = 232
+    Left = 488
+    Top = 32
   end
 end
